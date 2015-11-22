@@ -1,13 +1,18 @@
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.imageio.ImageIO;
 
@@ -266,7 +271,7 @@ public class Server {
 		Socket client2 = null;
 		try{
 			System.out.println("waiting on accept again...");
-			client2 = server.accept();
+			client2 = server2.accept();
 			System.out.println("Accept has happened again :)");
 		} catch (IOException e){
 			System.out.println("failed to accept :(");
@@ -279,15 +284,36 @@ public class Server {
 			System.out.println("Omg");
 			e1.printStackTrace();
 		}
-
-        StringBuilder output = new StringBuilder();
+		File f = new File("data.txt");
+		if(!f.exists()){
+			try {
+				f.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		PrintWriter toData = null;
+		try {
+			toData = new PrintWriter(new BufferedWriter(new FileWriter("data.txt", true)));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		StringBuilder output = new StringBuilder();
         output.append(foodamount + " " + clothesamount + " " + otheramount);
+        try {
+			Files.write(Paths.get("data.txt"), output.toString().getBytes(), StandardOpenOption.APPEND);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+        toData.println(output.toString());
         out2.println(output.toString());
+        
 //              System.out.printf("foods: %.2f\n", foodamount);
 //        System.out.printf("clothes: %.2f\n", clothesamount);
 //        System.out.printf("other: %.2f\n", otheramount);
         
-        
+        out2.close();
 		try {
 			server2.close();
 		} catch (IOException e) {
